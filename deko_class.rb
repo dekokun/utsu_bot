@@ -25,10 +25,6 @@ class DEKO
 
    end
    
-   def get_utsu_score(username)
-       utsu_score(username)
-   end
-   
    def get_my_friends
        @base.followers
    end
