@@ -1,6 +1,5 @@
 #! /usr/bin/ruby
 
-print "test"
 class DEKO 
    
    require 'net/https' 
@@ -72,10 +71,13 @@ class DEKO
    #前回の起動で取得していないリプライを配列で返す
    def get_new_replies
        replies = @base.replies
-       new = get_new_time
+       p new = get_new_time
        new_replies = []
-       new_time = replies[0].created_at
+       @new_time = replies[0].created_at
+       p "test"
+       p new
        replies.each do |reply|
+           p reply.created_at
            if reply.created_at == new
                return new_replies
            else 

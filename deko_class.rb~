@@ -1,6 +1,5 @@
 #! /usr/bin/ruby
 
-print "test"
 class DEKO 
    
    require 'net/https' 
@@ -74,8 +73,11 @@ class DEKO
        replies = @base.replies
        new = get_new_time
        new_replies = []
-       new_time = replies[0].created_at
+       @new_time = replies[0].created_at
+       p "test"
+       p new
        replies.each do |reply|
+           p reply.created_at
            if reply.created_at == new
                return new_replies
            else 
