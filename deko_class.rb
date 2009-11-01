@@ -89,7 +89,7 @@ class DEKO
            #もし最後リプライしていたのが自分だったら何もしない
            elsif new_request.user.screen_name.to_s == @user_name
            else
-               happy_word = "@#{new_request.user.screen_name} #{new_request.user.name}さんの最近の幸福度は" + utsu_score(new_request.user.screen_name).to_s + "です"
+               happy_word = "@#{new_request.user.screen_name} #{new_request.user.name}さんの最近の幸福度は" + get_utsu_score(new_request.user.screen_name).to_s + "です"
    
                @base.update(happy_word)
                print "@#{new_request.user.screen_name}"
