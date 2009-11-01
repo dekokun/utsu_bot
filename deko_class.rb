@@ -74,8 +74,6 @@ class DEKO
        p new = get_new_time
        new_replies = []
        @new_time = replies[0].created_at
-       p "test"
-       p new
        replies.each do |reply|
            p reply.created_at
            if reply.created_at == new
@@ -91,9 +89,7 @@ class DEKO
    
    def friends_happy
        @count = get_count
-       p 1
        replies = get_new_replies
-       p 2
        replies.each do |new_request|
            if new_request==nil
            #もし最後リプライしていたのが自分だったら何もしない
@@ -104,7 +100,6 @@ class DEKO
                @base.update(happy_word)
                print "@#{new_request.user.screen_name}"
                print " "
-               p 3
            end
        end
    end
