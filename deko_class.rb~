@@ -8,20 +8,22 @@ class DEKO
    require 'cgi'
    require 'rubygems'
    require 'twitter'
+   require 'yaml'
    require File.expand_path(File.dirname(__FILE__)) + '/utsu.rb'
    
-   def initialize(user_name)
+   def initialize()
        @data_home = File.expand_path(File.dirname(__FILE__)) + '/../data/'
        Twitter::HTTPAuth.http_proxy( nil, nil )
-       @user_name = user_name
-       File.open(@data_home+"password.txt","a+") do |f|
-           @password = f.gets.chomp
-       end
-       @base = Twitter::Base.new( Twitter::HTTPAuth.new( user_name, @password ) )
+       data_file = File.open(@data_home + "password.yaml")
+       user_data = YAML.load(data_file.read)
+       data_file.close
        @count_file = @data_home + "count.txt"
        @new_time_file = @data_home + "new_time.txt"
        @deko_score_file = @data_home + "deko_score.txt"
-       @my_name = "dekokun"
+       @bot_name = user_data['bot_name']
+       @my_name = user_data['my_name']
+       password = user_data['bot_pass']
+       @base = Twitter::Base.new( Twitter::HTTPAuth.new( @bot_name , password ) )
 
    end
    
@@ -87,9 +89,9 @@ class DEKO
        replies.each do |new_request|
            if new_request==nil
            #もし最後リプライしていたのが自分だったら何もしない
-           elsif new_request.user.screen_name.to_s == @user_name
+           elsif new_request.user.screen_name.to_s == @bot_name
            else
-               happy_word = "@#{new_request.user.screen_name} #{new_request.user.name}さんの最近の幸福度は" + utsu_score(new_request.user.screen_name).to_s + "です"
+               happy_word = "@#{new_request.user.screen_name} #{new_request.user.name}さんの最近の幸福度は" + get_utsu_score(new_request.user.screen_name).to_s + "です"
    
                @base.update(happy_word)
                print "@#{new_request.user.screen_name}"
@@ -144,7 +146,7 @@ end
 if $0 == __FILE__
     print Time.now
     print " "
-    a = DEKO.new("deko_test")
+    a = DEKO.new()
     a.friends_happy
     a.dekokun_happy
     a.write_count
