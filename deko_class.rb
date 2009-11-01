@@ -149,7 +149,6 @@ if $0 == __FILE__
     a.friends_happy
     a.dekokun_happy
     a.write_count
-    a.write_new_time
     a.write_deko_score
     print "\n"
 end
