@@ -74,7 +74,6 @@ class DEKO
        new_replies = []
        @new_time = replies[0].created_at
        replies.each do |reply|
-           p reply.created_at
            if reply.created_at == new
                return new_replies
            else 
