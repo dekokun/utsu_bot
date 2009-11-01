@@ -1,7 +1,7 @@
 #! /usr/bin/ruby
 
 
-class DEKO
+class DEKO #test
    
    require 'net/https' 
    require 'open-uri'
