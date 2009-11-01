@@ -1,7 +1,7 @@
 #! /usr/bin/ruby
 
 
-class DEKO #test
+class DEKO 
    
    require 'net/https' 
    require 'open-uri'
@@ -11,8 +11,7 @@ class DEKO #test
    require File.expand_path(File.dirname(__FILE__)) + '/utsu.rb'
    
    def initialize(user_name)
-       @home =  ENV['HOME'] + '/work/twitter/utsu_bot/'
-       @data_home = @home + 'data/'
+       @data_home = File.expand_path(File.dirname(__FILE__)) + '/../data/'
        Twitter::HTTPAuth.http_proxy( nil, nil )
        @user_name = user_name
        File.open(@data_home+"password.txt","a+") do |f|
