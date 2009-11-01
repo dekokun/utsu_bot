@@ -1,6 +1,6 @@
 #! /usr/bin/ruby
 
-
+print "test"
 class DEKO 
    
    require 'net/https' 
@@ -74,7 +74,7 @@ class DEKO
        replies = @base.replies
        new = get_new_time
        new_replies = []
-       @new_time = replies[0].created_at
+       new_time = replies[0].created_at
        replies.each do |reply|
            if reply.created_at == new
                return new_replies
@@ -82,13 +82,16 @@ class DEKO
                new_replies.push(reply)
            end
        end
+       write_new_time
        return new_replies
    end
    
    
    def friends_happy
        @count = get_count
+       p 1
        replies = get_new_replies
+       p 2
        replies.each do |new_request|
            if new_request==nil
            #もし最後リプライしていたのが自分だったら何もしない
@@ -99,20 +102,17 @@ class DEKO
                @base.update(happy_word)
                print "@#{new_request.user.screen_name}"
                print " "
+               p 3
            end
        end
    end
-   
-   
-   
-   
    
    
    def dekokun_happy
        #以下、自分の幸福度のお知らせ
        @count = get_count
        @deko_score = get_deko_score
-       if (@count.to_i % 60 == 0) && (@deko_score.to_i != (@deko_score = utsu_score(@my_name)))
+       if (@count.to_i % 60 == 0) && (@deko_score.to_i != (@deko_score = get_utsu_score(@my_name)))
            if @deko_score >= 0
              hagemashi = "」です。最近の@dekokun は珍しく多少の幸せにひたっているみたいです。祝福のリプライでもしてあげましょう"
            else
