@@ -157,5 +157,5 @@ if $0 == __FILE__
     a.dekokun_happy
     a.write_count
     a.write_deko_score
-    print "\n"
+    puts ""
 end
