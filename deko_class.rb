@@ -75,6 +75,7 @@ class DEKO
        old_new_time = get_new_time
        new_replies = []
        @new_time = replies[0].created_at
+       write_new_time
        replies.each do |reply|
            if reply.created_at == old_new_time
                return new_replies
@@ -82,7 +83,6 @@ class DEKO
                new_replies.push(reply)
            end
        end
-       write_new_time
        return new_replies
    end
    
