@@ -10,7 +10,7 @@ class DEKO
    require 'yaml'
    require File.expand_path(File.dirname(__FILE__)) + '/utsu.rb'
    
-   def initialize()
+   def initialize(test_flag)
        @data_home = File.expand_path(File.dirname(__FILE__)) + '/../data/'
        Twitter::HTTPAuth.http_proxy( nil, nil )
        data_file = File.open(@data_home + "password.yaml")
@@ -26,6 +26,7 @@ class DEKO
 
        password = user_data['bot_pass']
        @base = Twitter::Base.new( Twitter::HTTPAuth.new( @bot_name , password ) )
+       @test_flag = test_flag
 
    end
    
@@ -71,10 +72,11 @@ class DEKO
    #前回の起動で取得していないリプライを配列で返す
    def get_new_replies
        replies = @base.replies
+       old_new_time = get_new_time
        new_replies = []
        @new_time = replies[0].created_at
        replies.each do |reply|
-           if reply.created_at == new
+           if reply.created_at == old_new_time
                return new_replies
            else 
                new_replies.push(reply)
@@ -95,7 +97,7 @@ class DEKO
            else
                happy_word = "@#{new_request.user.screen_name} #{new_request.user.name}さんの最近の幸福度は" + get_utsu_score(new_request.user.screen_name).to_s + "です"
    
-               @base.update(happy_word)
+               @base.update(happy_word) if !@test_flag 
                print "@#{new_request.user.screen_name}"
                print " "
            end
@@ -113,7 +115,7 @@ class DEKO
            else
                hagemashi = "」です。@dekokun をなぐさめてあげましょう"
            end
-           @base.update("最近のポストから見る@dekokun の幸福度は「" + @deko_score.to_s + hagemashi)
+           @base.update("最近のポストから見る@dekokun の幸福度は「" + @deko_score.to_s + hagemashi) if !@test_flag
            print "deko_score:"
            print @deko_score
            print " "
@@ -144,7 +146,13 @@ end
 if $0 == __FILE__
     print Time.now
     print " "
-    a = DEKO.new()
+    if ARGV[0] == "t"
+        test_flag = true
+    else
+        test_flag == nil
+    end
+
+    a = DEKO.new(test_flag)
     a.friends_happy
     a.dekokun_happy
     a.write_count
