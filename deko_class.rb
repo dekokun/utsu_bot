@@ -142,8 +142,6 @@ class DEKO
    end
    
 end
-p $0
-p __FILE__
 
 if $0 == __FILE__
     print Time.now

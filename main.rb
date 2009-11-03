@@ -1,5 +1,4 @@
-require 'deko_class.rb'
-
+require File.expand_path(File.dirname(__FILE__)) + '/deko_class.rb'
 
 print Time.now
 print " "
