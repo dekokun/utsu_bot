@@ -23,7 +23,7 @@ class DEKO
        @deko_score_file = @data_home + "deko_score.txt"
        @bot_name = user_data['bot_name']
        @my_name = user_data['my_name']
-       @app_od = user_data['app_id']
+       @app_id = user_data['app_id']
 
        password = user_data['bot_pass']
        @base = Twitter::Base.new( Twitter::HTTPAuth.new( @bot_name , password ) )
