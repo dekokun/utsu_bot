@@ -23,6 +23,7 @@ class DEKO
        @deko_score_file = @data_home + "deko_score.txt"
        @bot_name = user_data['bot_name']
        @my_name = user_data['my_name']
+       @app_od = user_data['app_id']
 
        password = user_data['bot_pass']
        @base = Twitter::Base.new( Twitter::HTTPAuth.new( @bot_name , password ) )
@@ -95,7 +96,7 @@ class DEKO
            #もし最後リプライしていたのが自分だったら何もしない
            elsif new_request.user.screen_name.to_s == @bot_name
            else
-               happy_word = "@#{new_request.user.screen_name} #{new_request.user.name}さんの最近の幸福度は" + get_utsu_score(new_request.user.screen_name).to_s + "です"
+               happy_word = "@#{new_request.user.screen_name} #{new_request.user.name}さんの最近の幸福度は" + get_utsu_score(new_request.user.screen_name , app_id).to_s + "です"
    
                @base.update(happy_word) if !@test_flag 
                print "@#{new_request.user.screen_name}"
@@ -109,7 +110,7 @@ class DEKO
        #以下、自分の幸福度のお知らせ
        @count = get_count
        @deko_score = get_deko_score
-       if (@count.to_i % 60 == 0) && (@deko_score.to_i != (@deko_score = get_utsu_score(@my_name)))
+       if (@count.to_i % 60 == 0) && (@deko_score.to_i != (@deko_score = get_utsu_score(@my_name , app_id)))
            if @deko_score >= 0
              hagemashi = "」です。最近の@dekokun は珍しく多少の幸せにひたっているみたいです。祝福のリプライでもしてあげましょう"
            else

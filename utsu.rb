@@ -4,8 +4,9 @@ require 'hpricot'
 require 'open-uri'
 require 'cgi'
 require 'kconv'
+require 'yaml'
 
-def get_utsu_score(user_name)
+def get_utsu_score(user_name,app_id)
     pn_ja = []
     open('http://www.lr.pi.titech.ac.jp/~takamura/pubs/pn_ja.dic') do |f|
         while l = f.gets
@@ -13,7 +14,6 @@ def get_utsu_score(user_name)
         end
     end
 
-    app_id = 'p.OfYxaxg65wzzdXvezZcc7M8Di1ElwJvdogooliIgvGXh0CsSgUtz_TfDqR'
     #Yahoo!のアプリケーションIDを入力
     statuses = twitter_statuses(user_name) #調べたいユーザーのユーザー名を入力
     total_score = 0
@@ -48,5 +48,5 @@ def twitter_statuses(user_name)
 end
 
 if __FILE__ == $0
-    print utsu_score
+    print get_utsu_score
 end
