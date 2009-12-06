@@ -14,7 +14,6 @@ def get_utsu_score(user_name,app_id)
         end
     end
 
-    #Yahoo!のアプリケーションIDを入力
     statuses = twitter_statuses(user_name) #調べたいユーザーのユーザー名を入力
     total_score = 0
     count = 0

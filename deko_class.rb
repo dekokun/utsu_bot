@@ -155,7 +155,7 @@ if $0 == __FILE__
 
     a = DEKO.new(test_flag)
     a.friends_happy
-    a.dekokun_happy
+    #a.dekokun_happy
     a.write_count
     a.write_deko_score
     puts ""
