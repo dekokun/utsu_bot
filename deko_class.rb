@@ -99,7 +99,7 @@ class DEKO
                happy_word = "@#{new_request.user.screen_name} #{new_request.user.name}さんの最近の幸福度は" + get_utsu_score(new_request.user.screen_name , @app_id).to_s + "です"
    
                @base.update(happy_word) if !@test_flag 
-               print "@#{new_request.user.screen_name}"
+               print "send:@#{new_request.user.screen_name}"
                print " "
            end
        end
