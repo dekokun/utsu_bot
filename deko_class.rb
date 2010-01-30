@@ -18,7 +18,7 @@ class DEKO
         pn_ja = []
         open('../data/pn_ja.dic') do |f|
             while l = f.gets
-                pn_ja << l.chomp.toutf8.split(':')
+                pn_ja << l.chomp.split(':')
             end
         end
     
