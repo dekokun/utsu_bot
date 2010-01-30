@@ -2,13 +2,68 @@
 
 class DEKO 
    
+    $KCODE = 'u'
     require 'net/https' 
     require 'open-uri'
     require 'cgi'
     require 'rubygems'
     require 'twitter'
     require 'yaml'
-    require File.expand_path(File.dirname(__FILE__)) + '/utsu.rb'
+    require 'hpricot'
+    require 'kconv'
+    Net::HTTP.version_1_2
+    
+    
+    def get_utsu_score(user_name)
+        pn_ja = []
+        open('../data/pn_ja.dic') do |f|
+            while l = f.gets
+                pn_ja << l.chomp.toutf8.split(':')
+            end
+        end
+    
+        statuses = twitter_statuses(user_name) #調べたいユーザーのユーザー名を入力
+        total_score = 0
+        count = 0
+        status_all = ""
+        doc = ""
+    
+        statuses.each do |status|
+            status_all += status
+        end
+    
+        Net::HTTP.start('jlp.yahooapis.jp'){|http|
+        doc = http.post('/MAService/V1/parse', "appid=#{@app_id}&results=ma&response=baseform&sentence=#{CGI.escape(status_all)}").body
+        doc =  Hpricot(doc)}
+        words = (doc/:baseform).map {|i| i.inner_text}
+        score = 0
+    
+        words.each do |w|
+            if w.include?('@')
+                next
+            elsif i = pn_ja.assoc(w)
+                score += i[3].to_f
+                count += 1
+            elsif i = pn_ja.rassoc(w)
+                score += i[3].to_f
+                count += 1
+            end
+        end
+    
+        total_score += score
+        if count == 0
+    
+            return 0
+    
+        else
+            return (total_score/count)*100
+        end
+    end
+    
+    def twitter_statuses(user_name)
+        doc = open("http://twitter.com/statuses/user_timeline/#{user_name}.xml"){|f| Hpricot(f)}
+        (doc/:text).map {|i| i.inner_text}
+    end
 
 
     
@@ -32,6 +87,7 @@ class DEKO
         @test_flag = test_flag
     end
     
+
     def get_my_friends
         @base.followers
     end
@@ -100,7 +156,7 @@ class DEKO
             elsif screen_name == @bot_name
             elsif already_replied.include?(screen_name)
             else
-                happy_word = "@#{screen_name} #{new_request.user.name}さんの最近の幸福度は" + get_utsu_score(screen_name , @app_id).to_s + "です"
+                happy_word = "@#{screen_name} #{new_request.user.name}さんの最近の幸福度は" + get_utsu_score(screen_name ).to_s + "です"
     
                 @base.update(happy_word) if !@test_flag 
                 print "send:@#{screen_name}"
@@ -115,7 +171,7 @@ class DEKO
         #以下、自分の幸福度のお知らせ
         @count = get_count
         @deko_score = get_deko_score
-        if (@count.to_i % 60 == 0) && (@deko_score.to_i != (@deko_score = get_utsu_score(@my_name , @app_id)))
+        if (@count.to_i % 60 == 0) && (@deko_score.to_i != (@deko_score = get_utsu_score(@my_name)))
             if @deko_score >= 0
               hagemashi = "」です。最近の@dekokun は珍しく多少の幸せにひたっているみたいです。祝福のリプライでもしてあげましょう"
             else
