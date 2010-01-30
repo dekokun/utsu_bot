@@ -22,30 +22,36 @@ def get_utsu_score(user_name,app_id)
     count = 0
     status_all = ""
     doc = ""
+
     statuses.each do |status|
         status_all += status
     end
+
     Net::HTTP.start('http://jlp.yahooapis.jp'){|http|
-        doc = http.post('/MAService/V1/parse', "appid=#{app_id}&results=ma&response=baseform&sentence=#{CGI.escape(status_all)}")
-        doc =  Hpricot(doc)
-        words = (doc/:baseform).map {|i| i.inner_text}
-        score = 0
-        words.each do |w|
-            if w.include?('@')
-                next
-            elsif i = pn_ja.assoc(w)
-                score += i[3].to_f
-                count += 1
-            elsif i = pn_ja.rassoc(w)
-                score += i[3].to_f
-                count += 1
-            end
+    doc = http.post('/MAService/V1/parse', "appid=#{app_id}&results=ma&response=baseform&sentence=#{CGI.escape(status_all)}")}
+    doc =  Hpricot(doc)
+    words = (doc/:baseform).map {|i| i.inner_text}
+    score = 0
+
+    words.each do |w|
+        if w.include?('@')
+            next
+        elsif i = pn_ja.assoc(w)
+            score += i[3].to_f
+            count += 1
+        elsif i = pn_ja.rassoc(w)
+            score += i[3].to_f
+            count += 1
         end
-        total_score += score
+    end
+
+    total_score += score
     if count == 0
+
         return 0
+
     else
-        (total_score/count)*100
+        return (total_score/count)*100
     end
 end
 
@@ -57,4 +63,3 @@ end
 if __FILE__ == $0
     print get_utsu_score
 end
-
