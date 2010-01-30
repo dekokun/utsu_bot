@@ -8,7 +8,7 @@ require 'yaml'
 
 def get_utsu_score(user_name,app_id)
     pn_ja = []
-    open('http://www.lr.pi.titech.ac.jp/~takamura/pubs/pn_ja.dic') do |f|
+    open('../data/pn_ja.dic') do |f|
         while l = f.gets
             pn_ja << l.chomp.toutf8.split(':')
         end
@@ -17,8 +17,11 @@ def get_utsu_score(user_name,app_id)
     statuses = twitter_statuses(user_name) #調べたいユーザーのユーザー名を入力
     total_score = 0
     count = 0
+    status_all = ""
     statuses.each do |status|
-        doc = open("http://jlp.yahooapis.jp/MAService/V1/parse?appid=#{app_id}&results=ma&response=baseform&sentence=#{CGI.escape(status)}"){|f| Hpricot(f)}
+        status_all += status
+    end
+        doc = open("http://jlp.yahooapis.jp/MAService/V1/parse?appid=#{app_id}&results=ma&response=baseform&sentence=#{CGI.escape(status_all)}"){|f| Hpricot(f)}
         words = (doc/:baseform).map {|i| i.inner_text}
         score = 0
         words.each do |w|
@@ -33,7 +36,6 @@ def get_utsu_score(user_name,app_id)
             end
         end
         total_score += score
-    end
     if count == 0
         return 0
     else
@@ -49,3 +51,4 @@ end
 if __FILE__ == $0
     print get_utsu_score
 end
+
