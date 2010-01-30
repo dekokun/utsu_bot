@@ -90,17 +90,22 @@ class DEKO
    
    def friends_happy
        @count = get_count
+       reply_users = []
        replies = get_new_replies
        replies.each do |new_request|
+           screen_name = new_request.user.screen_name.to_s
            if new_request==nil
            #もし最後リプライしていたのが自分だったら何もしない
-           elsif new_request.user.screen_name.to_s == @bot_name
+           elsif screen_name == @bot_name
+           #すでにリプライしている場合、何もしない
+           elsif reply_users.include?(screen_name)
            else
-               happy_word = "@#{new_request.user.screen_name} #{new_request.user.name}さんの最近の幸福度は" + get_utsu_score(new_request.user.screen_name , @app_id).to_s + "です"
+               happy_word = "@#{screen_name} #{new_request.user.name}さんの最近の幸福度は" + get_utsu_score(screen_name , @app_id).to_s + "です"
    
                @base.update(happy_word) if !@test_flag 
-               print "send:@#{new_request.user.screen_name}"
+               print "send:@#{screen_name}"
                print " "
+               reply_users.push(screen_name)
            end
        end
    end
