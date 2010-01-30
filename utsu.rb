@@ -8,7 +8,7 @@ require 'yaml'
 
 def get_utsu_score(user_name,app_id)
     pn_ja = []
-    open('http://www.lr.pi.titech.ac.jp/~takamura/pubs/pn_ja.dic') do |f|
+    open('../data/pn_ja.dic') do |f|
         while l = f.gets
             pn_ja << l.chomp.toutf8.split(':')
         end
