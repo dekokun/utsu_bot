@@ -72,7 +72,7 @@ class DEKO
    
    #前回の起動で取得していないリプライを配列で返す
    def get_new_replies
-       replies = @base.replies
+       replies = @base.mentions
        old_new_time = get_new_time
        new_replies = []
        @new_time = replies[0].created_at
