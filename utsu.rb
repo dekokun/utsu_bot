@@ -17,18 +17,10 @@ def get_utsu_score(user_name,app_id)
     statuses = twitter_statuses(user_name) #調べたいユーザーのユーザー名を入力
     total_score = 0
     count = 0
-    status_all = ""
     statuses.each do |status|
-        status_all += status
-    end
-p "形態素解析"
-time=Time.now
-        doc = open("http://jlp.yahooapis.jp/MAService/V1/parse?appid=#{app_id}&results=ma&response=baseform&sentence=#{CGI.escape(status_all)}"){|f| Hpricot(f)}
-p Time.now - time
+        doc = open("http://jlp.yahooapis.jp/MAService/V1/parse?appid=#{app_id}&results=ma&response=baseform&sentence=#{CGI.escape(status)}"){|f| Hpricot(f)}
         words = (doc/:baseform).map {|i| i.inner_text}
         score = 0
-p "形態素のあてはめ"
-time = Time.now
         words.each do |w|
             if w.include?('@')
                 next
@@ -41,7 +33,7 @@ time = Time.now
             end
         end
         total_score += score
-p Time.now - time
+    end
     if count == 0
         return 0
     else
