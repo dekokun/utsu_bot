@@ -5,6 +5,9 @@ require 'open-uri'
 require 'cgi'
 require 'kconv'
 require 'yaml'
+require 'net/http'
+Net::HTTP.version_1_2
+
 
 def get_utsu_score(user_name,app_id)
     pn_ja = []
@@ -18,10 +21,13 @@ def get_utsu_score(user_name,app_id)
     total_score = 0
     count = 0
     status_all = ""
+    doc = ""
     statuses.each do |status|
         status_all += status
     end
-        doc = open("http://jlp.yahooapis.jp/MAService/V1/parse?appid=#{app_id}&results=ma&response=baseform&sentence=#{CGI.escape(status_all)}"){|f| Hpricot(f)}
+    Net::HTTP.start('http://jlp.yahooapis.jp'){|http|
+        doc = http.post('/MAService/V1/parse', "appid=#{app_id}&results=ma&response=baseform&sentence=#{CGI.escape(status_all)}")
+        doc =  Hpricot(doc)
         words = (doc/:baseform).map {|i| i.inner_text}
         score = 0
         words.each do |w|
