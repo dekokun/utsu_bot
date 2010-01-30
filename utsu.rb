@@ -27,9 +27,10 @@ def get_utsu_score(user_name,app_id)
         status_all += status
     end
 
-    Net::HTTP.start('http://jlp.yahooapis.jp'){|http|
-    doc = http.post('/MAService/V1/parse', "appid=#{app_id}&results=ma&response=baseform&sentence=#{CGI.escape(status_all)}")}
-    doc =  Hpricot(doc)
+    Net::HTTP.start('jlp.yahooapis.jp'){|http|
+    doc = http.post('/MAService/V1/parse', "appid=#{app_id}&results=ma&response=baseform&sentence=#{CGI.escape(status_all)}").body
+    doc =  Hpricot(doc)}
+    #doc = open("http://jlp.yahooapis.jp/MAService/V1/parse?appid=#{app_id}&results=ma&response=baseform&sentence=#{CGI.escape(status_all)}"){|f| Hpricot(f)}
     words = (doc/:baseform).map {|i| i.inner_text}
     score = 0
 
