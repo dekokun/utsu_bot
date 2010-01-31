@@ -89,7 +89,7 @@ class DEKO
     
 
     def get_my_friends
-        @base.followers
+        @base.friends
     end
     
     
@@ -215,9 +215,11 @@ if $0 == __FILE__
     end
 
     a = DEKO.new(test_flag)
-    a.friends_happy
+    p a.get_utsu_score(ARGV[0])
+
+    #a.friends_happy
     #a.dekokun_happy
-    a.write_count
-    a.write_deko_score
+    #a.write_count
+    #a.write_deko_score
     puts ""
 end
