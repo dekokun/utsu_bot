@@ -11,14 +11,21 @@ class DEKO
   require 'yaml'
   require 'hpricot'
   require 'kconv'
+  require 'jcode'
   Net::HTTP.version_1_2
   
   
   def get_utsu_score(user_name)
     pn_ja = []
-    open('../data/pn_ja.dic') do |f|
+    pn_ja_kana = []
+    open(@data_home + 'dic/pn_ja.dic') do |f|
       while l = f.gets
         pn_ja << l.chomp.split(':')
+      end
+    end
+    open(@data_home + 'dic/pn_ja_kana.dic') do |f|
+      while l = f.gets
+        pn_ja_kana << l.chomp.split(':')
       end
     end
   
@@ -29,7 +36,7 @@ class DEKO
     doc = ""
   
     statuses.each do |status|
-      status_all += status
+      status_all += (status + "。")
     end
   
     Net::HTTP.start('jlp.yahooapis.jp'){|http|
@@ -41,7 +48,10 @@ class DEKO
     words.each do |w|
       if w.include?('@')
         next
-      elsif i = pn_ja.assoc(w)
+      elsif w.match(/ア-ン/) && (i = pn_ja_kana.assoc(w) || i = pn_ja_kana.rassoc(w))
+        score += i[3].to_f
+        count += 1
+      elsif w.match(/[一-龠]/) && i = pn_ja.assoc(w)
         score += i[3].to_f
         count += 1
       elsif i = pn_ja.rassoc(w)
