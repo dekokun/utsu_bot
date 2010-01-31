@@ -16,18 +16,6 @@ class DEKO
   
   
   def get_utsu_score(user_name)
-    pn_ja = []
-    pn_ja_kana = []
-    open(@data_home + 'dic/pn_ja.dic') do |f|
-      while l = f.gets
-        pn_ja << l.chomp.split(':')
-      end
-    end
-    open(@data_home + 'dic/pn_ja_kana.dic') do |f|
-      while l = f.gets
-        pn_ja_kana << l.chomp.split(':')
-      end
-    end
   
     statuses = twitter_statuses(user_name) #調べたいユーザーのユーザー名を入力
     total_score = 0
@@ -48,13 +36,17 @@ class DEKO
     words.each do |w|
       if w.include?('@')
         next
-      elsif w.match(/ア-ン/) && (i = pn_ja_kana.assoc(w) || i = pn_ja_kana.rassoc(w))
-        score += i[3].to_f
-        count += 1
-      elsif w.match(/[一-龠]/) && i = pn_ja.assoc(w)
-        score += i[3].to_f
-        count += 1
-      elsif i = pn_ja.rassoc(w)
+      elsif w.match(/[ア-ン]/) 
+        if i = @pn_ja_kana.assoc(w) || i = @pn_ja_kana.rassoc(w)
+          score += i[3].to_f
+          count += 1
+        end
+      elsif w.match(/[一-龠]/) 
+        if i = @pn_ja.assoc(w)
+          score += i[3].to_f
+          count += 1
+        end
+      elsif i = @pn_ja.rassoc(w)
         score += i[3].to_f
         count += 1
       end
@@ -95,6 +87,19 @@ class DEKO
     password = user_data['bot_pass']
     @base = Twitter::Base.new( Twitter::HTTPAuth.new( @bot_name , password ) )
     @test_flag = test_flag
+
+    @pn_ja = []
+    @pn_ja_kana = []
+    open(@data_home + 'dic/pn_ja.dic') do |f|
+      while l = f.gets
+        @pn_ja << l.chomp.split(':')
+      end
+    end
+    open(@data_home + 'dic/pn_ja_kana.dic') do |f|
+      while l = f.gets
+        @pn_ja_kana << l.chomp.split(':')
+      end
+    end
   end
   
 
