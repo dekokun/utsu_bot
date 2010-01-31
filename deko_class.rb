@@ -33,7 +33,7 @@ class DEKO
     end
   
     Net::HTTP.start('jlp.yahooapis.jp'){|http|
-    doc = http.post('/MAService/V1/parse', "appid=#{@app_id}&results=ma&response=baseform&sentence=#{CGI.escape(status_all)}").body
+    doc = http.post('/MAService/V1/parse', "appid=#{@app_id}&results=ma&response=baseform&sentence=#{CGI.escape(status_all)}&filter=1|4|9|10").body
     doc =  Hpricot(doc)}
     words = (doc/:baseform).map {|i| i.inner_text}
     score = 0
@@ -88,7 +88,14 @@ class DEKO
   end
   
 
-  def get_my_friends(query=nil)
+  def get_my_friends(page = nil)
+    query = {}
+    puts "page=" + page
+    if page != nil
+      query = {"page" => page.to_i}
+    end
+    print "query="
+    p query
     @base.friends(query)
   end
   
