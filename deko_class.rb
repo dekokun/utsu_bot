@@ -58,7 +58,7 @@ class DEKO
       return 0
   
     else
-      return (total_score/count)*100
+      return (total_score/count)
     end
   end
   
@@ -67,14 +67,20 @@ class DEKO
     (doc/:text).map {|i| i.inner_text}
   end
 
+  def get_utsu_standard(username)
+    return 50 + (10 * (get_utsu_score(username) - @average))/(@standard_deviation)
+  end
 
   
   def initialize(test_flag)
     Twitter::HTTPAuth.http_proxy( nil, nil )
     @data_home = File.expand_path(File.dirname(__FILE__)) + '/../data/'
-    data_file = File.open(@data_home + "password.yaml")
-    user_data = YAML.load(data_file.read)
-    data_file.close
+    userdata_file = File.open(@data_home + "password.yaml")
+      user_data = YAML.load(userdata_file.read)
+    userdata_file.close
+    numericdata_file = File.open(@data_home + "numerical_value.yaml")
+      numeric_data = YAML.load(numericdata_file.read)
+    numericdata_file.close
  
     @count_file = @data_home + "count.txt"
     @new_time_file = @data_home + "new_time.txt"
@@ -83,6 +89,10 @@ class DEKO
     @bot_name = user_data['bot_name']
     @my_name = user_data['my_name']
     @app_id = user_data['app_id']
+
+    @average = numeric_data['average'].to_f
+    @standard_deviation = numeric_data['standard_deviation'].to_f
+
  
     password = user_data['bot_pass']
     @base = Twitter::Base.new( Twitter::HTTPAuth.new( @bot_name , password ) )
@@ -178,7 +188,7 @@ class DEKO
       elsif screen_name == @bot_name
       elsif already_replied.include?(screen_name)
       else
-        happy_word = "@#{screen_name} #{new_request.user.name}さんの最近の幸福度は" + get_utsu_score(screen_name ).to_s + "です"
+        happy_word = "@#{screen_name} #{new_request.user.name}さんの最近の幸福偏差値は" + get_utsu_standard(screen_name ).to_s + "です"
   
         @base.update(happy_word) if !@test_flag 
         print "send:@#{screen_name}"
@@ -235,7 +245,7 @@ if $0 == __FILE__
   end
 
   a = DEKO.new(test_flag)
-  p a.get_utsu_score(ARGV[0])
+  p a.get_utsu_standard(ARGV[0])
 
   #a.friends_happy
   #a.dekokun_happy
