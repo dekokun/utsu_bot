@@ -115,13 +115,12 @@ class DEKO
 
   def get_my_friends(page = nil)
     query = {}
-    puts "page=" + page
     if page != nil
       query = {"page" => page.to_i}
     end
     print "query="
     p query
-    @base.friends(query)
+    @base.followers(query)
   end
   
   
@@ -245,7 +244,8 @@ if $0 == __FILE__
   end
 
   a = DEKO.new(test_flag)
-  p a.get_utsu_standard(ARGV[0])
+  #p a.get_utsu_standard(ARGV[0])
+  p a.get_my_friends
 
   #a.friends_happy
   #a.dekokun_happy
