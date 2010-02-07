@@ -82,7 +82,6 @@ class DEKO
       numeric_data = YAML.load(numericdata_file.read)
     numericdata_file.close
  
-    @count_file = @data_home + "count.txt"
     @new_time_file = @data_home + "new_time.txt"
  
     @deko_score_file = @data_home + "deko_score.txt"
@@ -118,22 +117,10 @@ class DEKO
     if page != nil
       query = {"page" => page.to_i}
     end
-    print "query="
-    p query
     @base.followers(query)
   end
   
   
-  def get_count
-    File.open(@count_file,"a+") do |f|
-      count = f.gets
-      if count == nil
-        return "0"
-      else
-        return count.chomp
-      end
-    end
-  end
   
   def get_new_time
     File.open(@new_time_file,"a+") do |f|
@@ -177,7 +164,6 @@ class DEKO
   
   
   def friends_happy
-    @count = get_count
     replies = get_new_replies
     already_replied = []
     replies.each do |new_request|
@@ -198,29 +184,7 @@ class DEKO
   end
   
   
-  def dekokun_happy
-    #以下、自分の幸福度のお知らせ
-    @count = get_count
-    @deko_score = get_deko_score
-    if (@count.to_i % 60 == 0) && (@deko_score.to_i != (@deko_score = get_utsu_score(@my_name)))
-      if @deko_score >= 0
-        hagemashi = "」です。最近の@dekokun は珍しく多少の幸せにひたっているみたいです。祝福のリプライでもしてあげましょう"
-      else
-        hagemashi = "」です。@dekokun をなぐさめてあげましょう"
-      end
-      @base.update("最近のポストから見る@dekokun の幸福度は「" + @deko_score.to_s + hagemashi) if !@test_flag
-      print "deko_score:"
-      print @deko_score
-      print " "
-    end
-  end
   
-  def write_count
-    File.open(@count_file,"w") do |f|
-      next_count = @count.to_i + 1
-      f.puts next_count.to_s
-    end
-  end
   
   def write_new_time
     File.open(@new_time_file,"w") do |f|
@@ -249,6 +213,5 @@ if $0 == __FILE__
 
   #a.friends_happy
   #a.dekokun_happy
-  #a.write_count
   #a.write_deko_score
 end
