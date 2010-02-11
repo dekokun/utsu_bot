@@ -15,8 +15,46 @@ class DEKO
   Net::HTTP.version_1_2
   
   
-  def get_utsu_score(user_name)
+
   
+  def initialize(bot_name, app_id, password, test_flag)
+    @bot_name = bot_name
+    @app_id = app_id
+    @data_home = File.expand_path(File.dirname(__FILE__)) + '/../data/'
+    numeric_data = '';
+
+    Twitter::HTTPAuth.http_proxy( nil, nil )
+
+    File.open(@data_home + "numerical_value.yaml") do |numericdata_file |
+      numeric_data = YAML.load(numericdata_file.read)
+    end
+ 
+    @new_time_file = @data_home + "new_time.txt"
+ 
+
+    @average = numeric_data['average'].to_f
+    @standard_deviation = numeric_data['standard_deviation'].to_f
+
+ 
+    @base = Twitter::Base.new( Twitter::HTTPAuth.new( @bot_name , password ) )
+    @test_flag = test_flag
+
+  end
+  
+
+  def get_utsu_score(user_name)
+    pn_ja = []
+    pn_ja_kana = []
+    open(@data_home + 'dic/pn_ja.dic') do |f|
+      while l = f.gets
+        pn_ja << l.chomp.split(':')
+      end
+    end
+    open(@data_home + 'dic/pn_ja_kana.dic') do |f|
+      while l = f.gets
+        pn_ja_kana << l.chomp.split(':')
+      end
+    end
     statuses = twitter_statuses(user_name) #調べたいユーザーのユーザー名を入力
     total_score = 0
     count = 0
@@ -37,16 +75,16 @@ class DEKO
       if w.include?('@')
         next
       elsif w.match(/[ア-ン]/) 
-        if i = @pn_ja_kana.assoc(w) || i = @pn_ja_kana.rassoc(w)
+        if i = pn_ja_kana.assoc(w) || i = pn_ja_kana.rassoc(w)
           score += i[3].to_f
           count += 1
         end
       elsif w.match(/[一-龠]/) 
-        if i = @pn_ja.assoc(w)
+        if i = pn_ja.assoc(w)
           score += i[3].to_f
           count += 1
         end
-      elsif i = @pn_ja.rassoc(w)
+      elsif i = pn_ja.rassoc(w)
         score += i[3].to_f
         count += 1
       end
@@ -71,46 +109,7 @@ class DEKO
     return 50 + (10 * (get_utsu_score(username) - @average))/(@standard_deviation)
   end
 
-  
-  def initialize(test_flag)
-    Twitter::HTTPAuth.http_proxy( nil, nil )
-    @data_home = File.expand_path(File.dirname(__FILE__)) + '/../data/'
-    userdata_file = File.open(@data_home + "password.yaml")
-      user_data = YAML.load(userdata_file.read)
-    userdata_file.close
-    numericdata_file = File.open(@data_home + "numerical_value.yaml")
-      numeric_data = YAML.load(numericdata_file.read)
-    numericdata_file.close
- 
-    @new_time_file = @data_home + "new_time.txt"
- 
-    @deko_score_file = @data_home + "deko_score.txt"
-    @bot_name = user_data['bot_name']
-    @my_name = user_data['my_name']
-    @app_id = user_data['app_id']
 
-    @average = numeric_data['average'].to_f
-    @standard_deviation = numeric_data['standard_deviation'].to_f
-
- 
-    password = user_data['bot_pass']
-    @base = Twitter::Base.new( Twitter::HTTPAuth.new( @bot_name , password ) )
-    @test_flag = test_flag
-
-    @pn_ja = []
-    @pn_ja_kana = []
-    open(@data_home + 'dic/pn_ja.dic') do |f|
-      while l = f.gets
-        @pn_ja << l.chomp.split(':')
-      end
-    end
-    open(@data_home + 'dic/pn_ja_kana.dic') do |f|
-      while l = f.gets
-        @pn_ja_kana << l.chomp.split(':')
-      end
-    end
-  end
-  
 
   def get_my_friends(page = nil)
     query = {}
@@ -133,16 +132,6 @@ class DEKO
     end
   end
   
-  def get_deko_score
-    File.open(@deko_score_file,"a+") do |f|
-      deko_score = f.gets
-      if deko_score == nil
-        return "0"
-      else
-        return deko_score.chomp
-      end
-    end
-  end
   
   
   #前回の起動で取得していないリプライを配列で返す
@@ -191,27 +180,4 @@ class DEKO
       f.puts @new_time
     end
   end
-  
-  def write_deko_score
-    File.open(@deko_score_file,"w") do |f|
-      f.puts @deko_score
-    end
-  end
-   
-end
-
-if $0 == __FILE__
-  if ARGV[0] == "t"
-    test_flag = true
-  else
-    test_flag == nil
-  end
-
-  a = DEKO.new(test_flag)
-  #p a.get_utsu_standard(ARGV[0])
-  p a.get_my_friends
-
-  #a.friends_happy
-  #a.dekokun_happy
-  #a.write_deko_score
 end
