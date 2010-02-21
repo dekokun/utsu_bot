@@ -2,6 +2,8 @@
 
 require 'optparse'
 require 'yaml'
+require 'rubygems'
+require 'pg'
 require File.expand_path(File.dirname(__FILE__)) + '/deko_class.rb'
 
 OPTS = {}
@@ -14,15 +16,21 @@ end
 
 data_home = File.expand_path(File.dirname(__FILE__)) + '/../data/'
 
-user_data = ''
+config_data = ''
 
-File.open(data_home + "password.yaml", 'r') do | userdata_file |
-    user_data = YAML.load(userdata_file.read)
+File.open(data_home + "config.yaml", 'r') do | userdata_file |
+    config_data = YAML.load(userdata_file.read)
 end
 
-bot_name = user_data['bot_name']
-app_id = user_data['app_id']
-password = user_data['bot_pass']
+bot_name = config_data['bot_name']
+app_id = config_data['app_id']
+password = config_data['bot_pass']
+db_pass = config_data['db_pass']
+db_user = config_data['db_user']
+db_host = config_data['db_host']
+db_port = config_data['db_port']
+db_name = config_data['db_name']
+
 
 
 print Time.now
@@ -36,13 +44,15 @@ else
   test_flag = nil
 end
 
-utsu_bot = DEKO.new(bot_name, app_id, password, test_flag)
-
-if OPTS[:u]
-  puts "指定されたユーザの幸福度を測ります"
-  test_flag = true
-  puts utsu_bot.get_utsu_standard(OPTS[:u])
-else
-  utsu_bot.friends_happy
-  puts ""
+PGconn.connect(db_host, db_port, "", "", db_name, db_user, db_pass) do |conn|
+  utsu_bot = DEKO.new(bot_name, app_id, password, test_flag, conn)
+  
+  if OPTS[:u]
+    puts "指定されたユーザの幸福度を測ります"
+    test_flag = true
+    puts utsu_bot.get_utsu_standard(OPTS[:u])
+  else
+    utsu_bot.friends_happy
+    puts ""
+  end
 end
