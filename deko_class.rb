@@ -44,24 +44,21 @@ class DEKO
 
 
   def get_utsu_score(user_name)
-    statuses = twitter_statuses(user_name) #調べたいユーザーのユーザー名を入力
+    statuses = twitter_statuses(user_name)
     total_score = 0
     count = 0
     score = 0
-    status_all = ""
     doc = ""
 
-    statuses.each do |status|
-      status_all += (status + "。")
-    end
 
     Net::HTTP.start('jlp.yahooapis.jp') do |http|
-      doc = http.post('/MAService/V1/parse', "appid=#{@app_id}&results=ma&response=baseform&sentence=#{CGI.escape(status_all)}&filter=1|4|9|10").body
+      doc = http.post('/MAService/V1/parse', "appid=#{@app_id}&results=ma&response=baseform&sentence=#{CGI.escape(statuses)}&filter=1|4|9|10").body
       doc =  Hpricot(doc)
     end
     words = (doc/:baseform).map {|i| i.inner_text}
 
     words.each do |w|
+      #w = @conn.quote_ident(w)
       w.gsub!(/['\/"]/) {|ch| ch + ch }
       if w.include?('@')
         next
@@ -118,15 +115,18 @@ EOF
   end
 
   def twitter_statuses(user_name)
-    doc = open("http://twitter.com/statuses/user_timeline/#{user_name}.xml"){|f| Hpricot(f)}
-    (doc/:text).map {|i| i.inner_text}
+    query = {}
+    query[:id] = user_name
+    statuses = ""
+    @base.user_timeline(query).each do |timeline|
+      statuses += (timeline.text + "。")
+    end
+    return statuses
   end
 
   def get_utsu_standard(username)
-    return 50 + (10 * (get_utsu_score(username) - @average))/(@standard_deviation)
+      return 50 + (10 * (get_utsu_score(username) - @average))/(@standard_deviation)
   end
-
-
 
   def get_my_friends(page = nil)
     query = {}
