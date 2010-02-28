@@ -128,12 +128,20 @@ EOF
       return 50 + (10 * (get_utsu_score(username) - @average))/(@standard_deviation)
   end
 
-  def get_my_friends(page = nil)
+  def get_follower(user)
     query = {}
-    if page != nil
-      query = {"page" => page.to_i}
+    query[:id] = user
+    next_cursor = -1
+    all_followers = []
+    while next_cursor != 0
+      query[:cursor] = next_cursor
+      followers = @base.followers(query)
+      followers.users.each do |follower|
+        all_followers.push(follower.screen_name)
+      end
+      next_cursor = followers.next_cursor
     end
-    @base.followers(query)
+    all_followers
   end
 
 
