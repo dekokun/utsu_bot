@@ -124,8 +124,8 @@ EOF
     return statuses
   end
 
-  def get_utsu_standard(username)
-      return 50 + (10 * (get_utsu_score(username) - @average))/(@standard_deviation)
+  def get_utsu_standard(utsu_score)
+      return 50 + (10 * (utsu_score - @average))/(@standard_deviation)
   end
 
   def get_follower(user)
@@ -187,7 +187,7 @@ EOF
       elsif screen_name == @bot_name
       elsif already_replied.include?(screen_name)
       else
-        up_score = (get_utsu_standard(screen_name)*10).round.to_f / 10
+        up_score = (get_utsu_standard(get_utsu_score(screen_name))*10).round.to_f / 10
         happy_word = "@#{screen_name} #{new_request.user.name}さんの最近の幸福偏差値は" + up_score.to_s + "です"
 
         @base.update(happy_word) if !@test_flag

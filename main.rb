@@ -50,7 +50,7 @@ PGconn.connect(db_host, db_port, "", "", db_name, db_user, db_pass) do |conn|
   if OPTS[:u]
     puts "指定されたユーザの幸福度を測ります"
     test_flag = true
-    puts utsu_bot.get_utsu_standard(OPTS[:u])
+    puts utsu_bot.get_utsu_standard(utsu_bot.get_utsu_score(OPTS[:u]))
   else
     utsu_bot.friends_happy
     puts ""
