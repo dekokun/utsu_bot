@@ -182,6 +182,9 @@ EOF
     already_replied = []
     replies.each do |new_request|
       screen_name = new_request.user.screen_name.to_s
+      status_id = new_request.id
+      query = {}
+      query[:in_reply_to_status_id] = status_id
       if new_request == nil
       #もし最後リプライしていたのが自分だったら何もしない
       elsif screen_name == @bot_name
@@ -190,7 +193,7 @@ EOF
         up_score = (get_utsu_standard(get_utsu_score(screen_name))*10).round.to_f / 10
         happy_word = "@#{screen_name} #{new_request.user.name}さんの最近の幸福偏差値は" + up_score.to_s + "です"
 
-        @base.update(happy_word) if !@test_flag
+        @base.update(happy_word,query) if !@test_flag
         print "send:@#{screen_name}"
         print " "
         print happy_word if @test_flag
