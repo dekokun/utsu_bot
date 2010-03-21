@@ -218,7 +218,10 @@ EOF
     end
   end
 
-
+  def is_protected?(user)
+    user_information = @base.user(user)
+    return user_information.protected
+  end
 
 
   def write_new_time
