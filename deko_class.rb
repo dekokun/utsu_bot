@@ -145,6 +145,21 @@ EOF
     all_followers
   end
 
+  def get_friends(user)
+    query = {}
+    query[:id] = user
+    next_cursor = -1
+    all_friends = []
+    while next_cursor != 0
+      query[:cursor] = next_cursor
+      friends = @base.friends(query)
+      friends.users.each do |friend|
+        all_friends.push(friend.screen_name)
+      end
+      next_cursor = friends.next_cursor
+    end
+    all_friends
+  end
 
 
   def get_new_time
