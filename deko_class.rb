@@ -44,7 +44,11 @@ class DEKO
 
 
   def get_utsu_score(user_name)
-    statuses = twitter_statuses(user_name)
+    statuses_array = twitter_statuses(user_name)
+    statuses = ""
+    statuses_array.each do |timeline|
+      statuses += (timeline.text + "。")
+    end
     total_score = 0
     count = 0
     score = 0
@@ -117,10 +121,7 @@ EOF
   def twitter_statuses(user_name)
     query = {}
     query[:id] = user_name
-    statuses = ""
-    @base.user_timeline(query).each do |timeline|
-      statuses += (timeline.text + "。")
-    end
+    statuses = @base.user_timeline(query)
     return statuses
   end
 
