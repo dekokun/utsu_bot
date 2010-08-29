@@ -2,7 +2,6 @@
 
 class DEKO
 
-  $KCODE = 'u'
   require 'net/https'
   require 'open-uri'
   require 'cgi'
@@ -13,18 +12,18 @@ class DEKO
   require 'kconv'
   require 'jcode'
   Net::HTTP.version_1_2
+  $KCODE = 'u'
 
 
 
 
-  def initialize(bot_name, app_id, password, test_flag, conn)
+  def initialize(bot_name, app_id, test_flag, conn, base)
     @bot_name = bot_name
     @app_id = app_id
     @data_home = File.expand_path(File.dirname(__FILE__)) + '/../data/'
     @conn = conn
+    @base = base
     numeric_data = '';
-
-    Twitter::HTTPAuth.http_proxy( nil, nil )
 
     File.open(@data_home + "numerical_value.yaml") do |numericdata_file |
       numeric_data = YAML.load(numericdata_file.read)
@@ -37,7 +36,6 @@ class DEKO
     @standard_deviation = numeric_data['standard_deviation'].to_f
 
 
-    @base = Twitter::Base.new( Twitter::HTTPAuth.new( @bot_name , password ) )
     @test_flag = test_flag
 
   end
@@ -180,16 +178,21 @@ EOF
     replies = @base.mentions
     old_new_time = get_new_time
     new_replies = []
-    @new_time = replies[0].created_at
-    write_new_time
-    replies.each do |reply|
-      if reply.created_at == old_new_time
-        return new_replies
-      else
-        new_replies.push(reply)
+    if replies == []
+      @new_time = nil
+      return []
+    else
+      @new_time = replies[0].created_at
+      write_new_time
+      replies.each do |reply|
+        if reply.created_at == old_new_time
+          return new_replies
+        else
+          new_replies.push(reply)
+        end
       end
+      return new_replies
     end
-    return new_replies
   end
 
 
@@ -225,8 +228,10 @@ EOF
 
 
   def write_new_time
-    File.open(@new_time_file,"w") do |f|
-      f.puts @new_time
+    if @new_time != nil
+      File.open(@new_time_file,"w") do |f|
+        f.puts @new_time
+      end
     end
   end
 end
