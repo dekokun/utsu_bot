@@ -55,7 +55,7 @@ base = Twitter::Base.new(oauth)
 
 PGconn.connect(db_host, db_port, "", "", db_name, db_user, db_pass) do |conn|
 
-  utsu_bot = DEKO.new(bot_name, app_id, test_flag, conn, base)
+  utsu_bot = UTSU_BOT.new(bot_name, app_id, test_flag, conn, base)
   
   if OPTS[:u]
     puts "指定されたユーザの幸福度を測ります"

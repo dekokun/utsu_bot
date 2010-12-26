@@ -1,6 +1,6 @@
 #! /usr/bin/ruby
 
-class DEKO
+class UTSU_BOT
 
   require 'net/https'
   require 'open-uri'
